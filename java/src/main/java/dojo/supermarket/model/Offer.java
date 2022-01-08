@@ -16,23 +16,32 @@ public class Offer {
     }
 
 
-    public double getDiscountAmount(double unitPrice, double quantity){
+    public Discount getOfferDiscount(Product p,double unitPrice, double quantity){
         double basePrice = quantity * unitPrice;
         double discount = 0;
+        String description = "";
         switch (offerType) {
             case TwoForAmount:
-                discount = ((int) quantity >= 2) ? getForAmountDiscount(unitPrice, (int) quantity, 2) : 0;
+                discount = ((int) quantity >= 2) ? basePrice -getForAmountDiscount(unitPrice, (int) quantity, 2) : 0;
+                description = "2 for " + argument;
                 break;
             case ThreeForTwo:
-                discount = ((int) quantity > 2) ? getThreeForTwoDiscount(unitPrice, (int) quantity) : 0;
+                discount = ((int) quantity > 2) ? basePrice - getThreeForTwoDiscount(unitPrice, (int) quantity) : 0;
+                description = "3 for 2";
                 break;
             case TenPercentDiscount:
-                return quantity * unitPrice * argument / 100.0;
+                discount = quantity * unitPrice * argument / 100.0;
+                description = argument + "% off";
+                break;
             case FiveForAmount:
-                discount = ((int) quantity >= 5) ? getForAmountDiscount(unitPrice, (int) quantity,5) : 0;
+                discount = ((int) quantity >= 5) ? basePrice -getForAmountDiscount(unitPrice, (int) quantity,5) : 0;
+                description = "5 for " + argument;
                 break;
         }
-        return basePrice - discount;
+        if(discount != 0) {
+            return new Discount(p, description, -discount);
+        }
+        return null;
     }
 
     private double getThreeForTwoDiscount(double unitPrice, int quantityAsInt) {
@@ -43,24 +52,5 @@ public class Offer {
         return argument * (quantityAsInt / divisor) + quantityAsInt % divisor * unitPrice;
     }
 
-    public String getDiscountDescription(){
-        switch (offerType) {
-            case TwoForAmount:
-                return "2 for " + argument;
-            case ThreeForTwo:
-                return "3 for 2";
-            case TenPercentDiscount:
-                return argument + "% off";
-            case FiveForAmount:
-                return "5 for " + argument;
-            default:
-                return "";
-        }
-    }
-    public Discount getOfferDiscount(Product p,double unitPrice, double quantity){
-        if(getDiscountAmount(unitPrice,quantity) == 0)
-            return null;
-        return new Discount(p, getDiscountDescription(), -getDiscountAmount(unitPrice,quantity));
-    }
 
 }
