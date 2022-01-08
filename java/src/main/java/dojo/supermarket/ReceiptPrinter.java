@@ -44,10 +44,7 @@ public class ReceiptPrinter {
     }
 
     private String presentReceiptItem(ReceiptItem item) {
-        String totalPricePresentation = presentPrice(item.getTotalPrice());
-        String name = item.getProduct().getName();
-
-        String line = formatLineWithWhitespace(name, totalPricePresentation);
+        String line = formatLineWithWhitespace(getItemName(item), presentPrice(item.getTotalPrice()));
 
         if (item.getQuantity() != 1) {
             line += "  " + presentPrice(item.getPrice()) + " * " + presentQuantity(item) + "\n";
@@ -55,29 +52,35 @@ public class ReceiptPrinter {
         return line;
     }
 
-    private String presentDiscount(Discount discount) {
-        String name = discount.getDescription() + "(" + discount.getProduct().getName() + ")";
-        String value = presentPrice(discount.getDiscountAmount());
+    private String getItemName(ReceiptItem item) {
+        return item.getProduct().getName();
+    }
 
-        return formatLineWithWhitespace(name, value);
+    private String presentDiscount(Discount discount) {
+        return formatLineWithWhitespace(getDiscountName(discount), presentPrice(discount.getDiscountAmount()));
+    }
+
+    private String getDiscountName(Discount discount) {
+        return discount.getDescription() + "(" + discount.getProduct().getName() + ")";
     }
 
     private String presentTotal(Receipt receipt) {
-        String name = "Total: ";
-        String value = presentPrice(receipt.getTotalPrice());
-        return formatLineWithWhitespace(name, value);
+        return formatLineWithWhitespace("Total: ", presentPrice(receipt.getTotalPrice()));
     }
 
     private String formatLineWithWhitespace(String name, String value) {
         StringBuilder line = new StringBuilder();
         line.append(name);
-        int whitespaceSize = this.columns - name.length() - value.length();
-        for (int i = 0; i < whitespaceSize; i++) {
+        for (int i = 0; i < getWhitespaceSize(name, value); i++) {
             line.append(" ");
         }
         line.append(value);
         line.append('\n');
         return line.toString();
+    }
+
+    private int getWhitespaceSize(String name, String value) {
+        return this.columns - name.length() - value.length();
     }
 
     private static String presentPrice(double price) {
