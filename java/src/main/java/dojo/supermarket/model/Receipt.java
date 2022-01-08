@@ -8,12 +8,21 @@ public class Receipt {
     private List<Discount> discounts = new ArrayList<>();
 
     public Double getTotalPrice() {
+        return getItemsPrice() + getDiscountsAmount();
+    }
+
+    private double getDiscountsAmount() {
+        double total = 0.0;
+        for (Discount discount : this.discounts) {
+            total += discount.getDiscountAmount();
+        }
+        return total;
+    }
+
+    private double getItemsPrice() {
         double total = 0.0;
         for (ReceiptItem item : this.items) {
             total += item.getTotalPrice();
-        }
-        for (Discount discount : this.discounts) {
-            total += discount.getDiscountAmount();
         }
         return total;
     }
