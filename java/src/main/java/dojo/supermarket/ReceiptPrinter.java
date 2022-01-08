@@ -7,6 +7,7 @@ import java.util.Locale;
 public class ReceiptPrinter {
 
     private final int columns;
+    private StringBuilder receiptText = new StringBuilder();
 
     public ReceiptPrinter() {
         this(40);
@@ -17,19 +18,29 @@ public class ReceiptPrinter {
     }
 
     public String printReceipt(Receipt receipt) {
-        StringBuilder result = new StringBuilder();
-        for (ReceiptItem item : receipt.getItems()) {
-            String receiptItem = presentReceiptItem(item);
-            result.append(receiptItem);
-        }
+        addReceiptItems(receipt);
+        addReceiptDiscounts(receipt);
+        addTotalPrice(receipt);
+        return receiptText.toString();
+    }
+
+    private void addTotalPrice(Receipt receipt) {
+        receiptText.append("\n");
+        receiptText.append(presentTotal(receipt));
+    }
+
+    private void addReceiptDiscounts(Receipt receipt) {
         for (Discount discount : receipt.getDiscounts()) {
             String discountPresentation = presentDiscount(discount);
-            result.append(discountPresentation);
+            receiptText.append(discountPresentation);
         }
+    }
 
-        result.append("\n");
-        result.append(presentTotal(receipt));
-        return result.toString();
+    private void addReceiptItems(Receipt receipt) {
+        for (ReceiptItem item : receipt.getItems()) {
+            String receiptItem = presentReceiptItem(item);
+            receiptText.append(receiptItem);
+        }
     }
 
     private String presentReceiptItem(ReceiptItem item) {
